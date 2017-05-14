@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import main.java.domain.Comment;
 import main.java.domain.Film;
+import main.java.domain.Score;
 import main.java.domain.services.CommentService;
 import main.java.domain.services.FilmService;
 
@@ -166,17 +167,17 @@ private CommentService commentDb = new CommentService();
 		}
 
 		if (result.getScoreList() == null) {
-			result.setScoreList(new ArrayList<Integer>());
+			result.setScoreList(new ArrayList<Score>());
 		}
 		
-		ArrayList<Integer> scoreList = result.getScoreList();
+		ArrayList<Score> scoreList = result.getScoreList();
 		
 		int[] array = new int[scoreList.size()];
 
-	    Iterator<Integer> iterator = scoreList.iterator();
+	    Iterator<Score> iterator = scoreList.iterator();
 	    for (int i = 0; i < array.length; i++)
 	    {
-	        array[i] = iterator.next().intValue();
+	        array[i] = iterator.next().getScore();
 	    }
 	    return Arrays.toString(array);
 	}
@@ -192,7 +193,7 @@ private CommentService commentDb = new CommentService();
 		}
 		
 		if (result.getScoreList() == null) {
-			result.setScoreList(new ArrayList<Integer>());
+			result.setScoreList(new ArrayList<Score>());
 		}
 		
 		return String.valueOf(result.getAverageScore());
@@ -200,16 +201,17 @@ private CommentService commentDb = new CommentService();
 
 	@POST
 	@Path("/{filmId}/score")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response addScore(@PathParam("filmId") int filmId, int score) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addScore(@PathParam("filmId") int filmId, Score score) {
 		Film result = db.get(filmId);
+		
 		
 		if (result == null) {
 			return Response.status(404).build();
 		}
 		
 		if (result.getScoreList() == null) {
-			result.setScoreList(new ArrayList<Integer>());
+			result.setScoreList(new ArrayList<Score>());
 		}
 		
 		result.getScoreList().add(score);

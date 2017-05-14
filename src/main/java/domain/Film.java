@@ -7,8 +7,9 @@ public class Film {
 	private int id;
 	private String title;
 	private String description;
-	private ArrayList<Integer> scoreList = new ArrayList<Integer>();
+	private ArrayList<Score> scoreList = new ArrayList<Score>();
 	private ArrayList<Comment> commentList = new ArrayList<Comment>();
+	private double avscore = 0;
 
 	public int getId() {
 		return id;
@@ -30,10 +31,10 @@ public class Film {
 		this.description = description;
 	}
 
-	public ArrayList<Integer> getScoreList() {
+	public ArrayList<Score> getScoreList() {
 		return scoreList;
 	}
-	public void setScoreList(ArrayList<Integer> scoreList) {
+	public void setScoreList(ArrayList<Score> scoreList) {
 		this.scoreList = scoreList;
 	}
 	
@@ -44,24 +45,24 @@ public class Film {
 		this.commentList = commentList;
 	}
 	
-	public void addScore(int score) {
+	public void addScore(Score score) {
 		this.scoreList.add(score);
 	}
 	
 	public double getAverageScore() {
-		double score = 0;
 		
-		for (int i = 0; i < this.scoreList.size(); i++) {
-			score += this.scoreList.get(i);
+		int sum = 0;
+
+		
+		for(Score s : this.scoreList){
+			sum+= s.getScore();
 		}
 		
-		score = score / this.scoreList.size();
+		avscore = sum/scoreList.size();
 		
-		score = score * 100;
-		score = Math.round(score);
-		score = score / 100;
+
 		
-		return score;
+		return avscore;
 	}
 	
 	public void addComment(Comment comment) {
