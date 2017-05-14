@@ -1,17 +1,24 @@
 package main.java.rest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
+import main.java.domain.Comment;
 import main.java.domain.Film;
+import main.java.domain.services.CommentService;
 import main.java.domain.services.FilmService;
 
 
@@ -20,6 +27,7 @@ import main.java.domain.services.FilmService;
 public class FilmResources {
 
 private FilmService db = new FilmService();
+private CommentService commentDb = new CommentService();
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -34,4 +42,178 @@ private FilmService db = new FilmService();
 		return Response.ok(film.getId()).build();
 	}
 	
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response get(@PathParam("id") int id) {
+		Film result = db.get(id);
+		
+		if (result == null) {
+			return Response.status(404).build();
+		}
+		
+		return Response.ok(result).build();
+	}
+	
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response update(@PathParam("id") int id, Film film) {
+		Film result = db.get(id);
+		
+		if (result == null) {
+			return Response.status(404).build();
+		}
+
+		film.setId(id);
+		db.update(film);
+
+		return Response.ok().build();
+	}
+	
+	@DELETE
+	@Path("/{id}")
+	public Response delete(@PathParam("id") int id) {
+		Film result = db.get(id);
+		
+		if (result == null) {
+			return Response.status(404).build();
+		}
+		
+		db.delete(result);
+		
+		return Response.ok().build();
+	}
+	
+	@GET
+	@Path("/{filmId}/comment")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Comment> getCommentList(@PathParam("filmId") int filmId) {
+		Film result = db.get(filmId);
+		
+		if (result == null) {
+			return null;
+		}
+		
+		if (result.getCommentList() == null) {
+			result.setCommentList(new ArrayList<Comment>());
+		}
+		
+		return result.getCommentList();
+	}
+	
+	@POST
+	@Path("/{filmId}/comment")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addComment(@PathParam("filmId") int filmId, Comment comment) {
+		Film result = db.get(filmId);
+		
+		if (result == null) {
+			return Response.status(404).build();
+		}
+		
+		if (result.getCommentList() == null) {
+			result.setCommentList(new ArrayList<Comment>());
+		}
+		
+		commentDb.add(comment);
+
+		comment.setId(commentDb.getCurrentId());
+		result.getCommentList().add(comment);
+		
+		return Response.ok().build();
+	}
+	
+	@DELETE
+	@Path("/{filmId}/comment/{commentId}")
+	public Response deleteComment(@PathParam("filmId") int filmId, @PathParam("commentId") int commentId) {
+		Film f = db.get(filmId);
+		
+		if (f == null) {
+			return Response.status(404).build();
+		}
+		
+		ArrayList<Comment> comments = f.getCommentList();
+		
+		if (comments == null) {
+			return Response.status(404).build();
+		}
+		
+		Comment found = new Comment();
+		
+		for (Comment c : comments) {
+			if (c.getId() == commentId) {
+				found = c;
+			}
+		}
+		
+		comments.remove(found);
+		
+		Comment comment = commentDb.get(commentId);
+		commentDb.delete(comment);
+		
+		return Response.ok().build();
+	}
+	
+	@GET
+	@Path("/{filmId}/score")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getScoreList(@PathParam("filmId") int filmId) {
+		Film result = db.get(filmId);
+
+		if (result == null) {
+			return null;
+		}
+
+		if (result.getScoreList() == null) {
+			result.setScoreList(new ArrayList<Integer>());
+		}
+		
+		ArrayList<Integer> scoreList = result.getScoreList();
+		
+		int[] array = new int[scoreList.size()];
+
+	    Iterator<Integer> iterator = scoreList.iterator();
+	    for (int i = 0; i < array.length; i++)
+	    {
+	        array[i] = iterator.next().intValue();
+	    }
+	    return Arrays.toString(array);
+	}
+	
+	@GET
+	@Path("/{filmId}/averagescore")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAverageScore(@PathParam("filmId") int filmId) {
+		Film result = db.get(filmId);
+		
+		if (result == null) {
+			return null;
+		}
+		
+		if (result.getScoreList() == null) {
+			result.setScoreList(new ArrayList<Integer>());
+		}
+		
+		return String.valueOf(result.getAverageScore());
+	}
+
+	@POST
+	@Path("/{filmId}/score")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response addScore(@PathParam("filmId") int filmId, int score) {
+		Film result = db.get(filmId);
+		
+		if (result == null) {
+			return Response.status(404).build();
+		}
+		
+		if (result.getScoreList() == null) {
+			result.setScoreList(new ArrayList<Integer>());
+		}
+		
+		result.getScoreList().add(score);
+		
+		return Response.ok().build();
+	}
 }

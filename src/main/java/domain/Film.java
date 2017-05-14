@@ -1,11 +1,14 @@
 package main.java.domain;
 
+import java.util.ArrayList;
+
 public class Film {
 	
 	private int id;
 	private String title;
-	private String comment;
-	//private int rating;
+	private String description;
+	private ArrayList<Integer> scoreList = new ArrayList<Integer>();
+	private ArrayList<Comment> commentList = new ArrayList<Comment>();
 
 	public int getId() {
 		return id;
@@ -19,11 +22,50 @@ public class Film {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public String getComment() {
-		return comment;
+	
+	public String getDescription() {
+		return description;
 	}
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public ArrayList<Integer> getScoreList() {
+		return scoreList;
+	}
+	public void setScoreList(ArrayList<Integer> scoreList) {
+		this.scoreList = scoreList;
+	}
+	
+	public ArrayList<Comment> getCommentList() {
+		return commentList;
+	}
+	public void setCommentList(ArrayList<Comment> commentList) {
+		this.commentList = commentList;
+	}
+	
+	public void addScore(int score) {
+		this.scoreList.add(score);
+	}
+	
+	public double getAverageScore() {
+		double score = 0;
+		
+		for (int i = 0; i < this.scoreList.size(); i++) {
+			score += this.scoreList.get(i);
+		}
+		
+		score = score / this.scoreList.size();
+		
+		score = score * 100;
+		score = Math.round(score);
+		score = score / 100;
+		
+		return score;
+	}
+	
+	public void addComment(Comment comment) {
+		commentList.add(comment);
 	}
 	
 	

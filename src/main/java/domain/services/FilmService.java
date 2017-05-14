@@ -10,7 +10,7 @@ import main.java.domain.Film;
 public class FilmService {
 
 	private static List<Film> db = new ArrayList<Film>();
-	private static int currentId = 1;
+	private static int currentId = 0;
 	public List<Film> getAll(){
 		return db;
 	}
@@ -32,7 +32,7 @@ public class FilmService {
 		for(Film f :db){
 			if(f.getId()==film.getId()){
 				f.setTitle(film.getTitle());
-				f.setComment(film.getComment());
+				f.setDescription(film.getDescription());
 			}
 		}
 	}
